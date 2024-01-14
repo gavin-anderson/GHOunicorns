@@ -6,24 +6,69 @@
 	"output": {
 		"abi": [
 			{
+				"anonymous": false,
 				"inputs": [
 					{
-						"internalType": "contract IERC721",
-						"name": "_uniswapV3NFT",
+						"indexed": true,
+						"internalType": "address",
+						"name": "owner",
 						"type": "address"
 					},
 					{
-						"internalType": "contract IGHO",
-						"name": "_ghoToken",
+						"indexed": true,
+						"internalType": "address",
+						"name": "spender",
+						"type": "address"
+					},
+					{
+						"indexed": false,
+						"internalType": "uint256",
+						"name": "value",
+						"type": "uint256"
+					}
+				],
+				"name": "Approval",
+				"type": "event"
+			},
+			{
+				"anonymous": false,
+				"inputs": [
+					{
+						"indexed": true,
+						"internalType": "address",
+						"name": "from",
+						"type": "address"
+					},
+					{
+						"indexed": true,
+						"internalType": "address",
+						"name": "to",
+						"type": "address"
+					},
+					{
+						"indexed": false,
+						"internalType": "uint256",
+						"name": "value",
+						"type": "uint256"
+					}
+				],
+				"name": "Transfer",
+				"type": "event"
+			},
+			{
+				"inputs": [
+					{
+						"internalType": "address",
+						"name": "owner",
+						"type": "address"
+					},
+					{
+						"internalType": "address",
+						"name": "spender",
 						"type": "address"
 					}
 				],
-				"stateMutability": "nonpayable",
-				"type": "constructor"
-			},
-			{
-				"inputs": [],
-				"name": "Loan2Value",
+				"name": "allowance",
 				"outputs": [
 					{
 						"internalType": "uint256",
@@ -35,72 +80,26 @@
 				"type": "function"
 			},
 			{
-				"inputs": [],
-				"name": "ghoToken",
-				"outputs": [
+				"inputs": [
 					{
-						"internalType": "contract IGHO",
-						"name": "",
+						"internalType": "address",
+						"name": "spender",
 						"type": "address"
-					}
-				],
-				"stateMutability": "view",
-				"type": "function"
-			},
-			{
-				"inputs": [
-					{
-						"internalType": "uint256",
-						"name": "tokenId",
-						"type": "uint256"
-					}
-				],
-				"name": "healthUpdate",
-				"outputs": [],
-				"stateMutability": "nonpayable",
-				"type": "function"
-			},
-			{
-				"inputs": [
-					{
-						"internalType": "uint256",
-						"name": "tokenId",
-						"type": "uint256"
 					},
 					{
 						"internalType": "uint256",
-						"name": "additionalBorrow",
+						"name": "value",
 						"type": "uint256"
 					}
 				],
-				"name": "increaseBorrowAmount",
-				"outputs": [],
-				"stateMutability": "nonpayable",
-				"type": "function"
-			},
-			{
-				"inputs": [],
-				"name": "liquidRatio",
+				"name": "approve",
 				"outputs": [
 					{
-						"internalType": "uint256",
+						"internalType": "bool",
 						"name": "",
-						"type": "uint256"
+						"type": "bool"
 					}
 				],
-				"stateMutability": "view",
-				"type": "function"
-			},
-			{
-				"inputs": [
-					{
-						"internalType": "uint256",
-						"name": "tokenId",
-						"type": "uint256"
-					}
-				],
-				"name": "liquidation",
-				"outputs": [],
 				"stateMutability": "nonpayable",
 				"type": "function"
 			},
@@ -108,9 +107,23 @@
 				"inputs": [
 					{
 						"internalType": "address",
-						"name": "operator",
+						"name": "account",
 						"type": "address"
-					},
+					}
+				],
+				"name": "balanceOf",
+				"outputs": [
+					{
+						"internalType": "uint256",
+						"name": "",
+						"type": "uint256"
+					}
+				],
+				"stateMutability": "view",
+				"type": "function"
+			},
+			{
+				"inputs": [
 					{
 						"internalType": "address",
 						"name": "from",
@@ -118,21 +131,65 @@
 					},
 					{
 						"internalType": "uint256",
-						"name": "tokenId",
+						"name": "amount",
 						"type": "uint256"
-					},
-					{
-						"internalType": "bytes",
-						"name": "data",
-						"type": "bytes"
 					}
 				],
-				"name": "onERC721Received",
+				"name": "burn",
+				"outputs": [],
+				"stateMutability": "nonpayable",
+				"type": "function"
+			},
+			{
+				"inputs": [
+					{
+						"internalType": "address",
+						"name": "to",
+						"type": "address"
+					},
+					{
+						"internalType": "uint256",
+						"name": "amount",
+						"type": "uint256"
+					}
+				],
+				"name": "mint",
+				"outputs": [],
+				"stateMutability": "nonpayable",
+				"type": "function"
+			},
+			{
+				"inputs": [],
+				"name": "totalSupply",
 				"outputs": [
 					{
-						"internalType": "bytes4",
+						"internalType": "uint256",
 						"name": "",
-						"type": "bytes4"
+						"type": "uint256"
+					}
+				],
+				"stateMutability": "view",
+				"type": "function"
+			},
+			{
+				"inputs": [
+					{
+						"internalType": "address",
+						"name": "to",
+						"type": "address"
+					},
+					{
+						"internalType": "uint256",
+						"name": "value",
+						"type": "uint256"
+					}
+				],
+				"name": "transfer",
+				"outputs": [
+					{
+						"internalType": "bool",
+						"name": "",
+						"type": "bool"
 					}
 				],
 				"stateMutability": "nonpayable",
@@ -141,56 +198,27 @@
 			{
 				"inputs": [
 					{
-						"internalType": "uint256",
-						"name": "tokenId",
-						"type": "uint256"
-					}
-				],
-				"name": "payback",
-				"outputs": [],
-				"stateMutability": "payable",
-				"type": "function"
-			},
-			{
-				"inputs": [],
-				"name": "scalingFactor",
-				"outputs": [
-					{
-						"internalType": "uint256",
-						"name": "",
-						"type": "uint256"
-					}
-				],
-				"stateMutability": "view",
-				"type": "function"
-			},
-			{
-				"inputs": [],
-				"name": "uniswapV3NFT",
-				"outputs": [
-					{
-						"internalType": "contract IERC721",
-						"name": "",
+						"internalType": "address",
+						"name": "from",
 						"type": "address"
-					}
-				],
-				"stateMutability": "view",
-				"type": "function"
-			},
-			{
-				"inputs": [
+					},
+					{
+						"internalType": "address",
+						"name": "to",
+						"type": "address"
+					},
 					{
 						"internalType": "uint256",
-						"name": "tokenId",
+						"name": "value",
 						"type": "uint256"
 					}
 				],
-				"name": "valuation",
+				"name": "transferFrom",
 				"outputs": [
 					{
-						"internalType": "uint256",
+						"internalType": "bool",
 						"name": "",
-						"type": "uint256"
+						"type": "bool"
 					}
 				],
 				"stateMutability": "nonpayable",
@@ -198,10 +226,33 @@
 			}
 		],
 		"devdoc": {
+			"events": {
+				"Approval(address,address,uint256)": {
+					"details": "Emitted when the allowance of a `spender` for an `owner` is set by a call to {approve}. `value` is the new allowance."
+				},
+				"Transfer(address,address,uint256)": {
+					"details": "Emitted when `value` tokens are moved from one account (`from`) to another (`to`). Note that `value` may be zero."
+				}
+			},
 			"kind": "dev",
 			"methods": {
-				"onERC721Received(address,address,uint256,bytes)": {
-					"details": "Whenever an {IERC721} `tokenId` token is transferred to this contract via {IERC721-safeTransferFrom} by `operator` from `from`, this function is called. It must return its Solidity selector to confirm the token transfer. If any other value is returned or the interface is not implemented by the recipient, the transfer will be reverted. The selector can be obtained in Solidity with `IERC721Receiver.onERC721Received.selector`."
+				"allowance(address,address)": {
+					"details": "Returns the remaining number of tokens that `spender` will be allowed to spend on behalf of `owner` through {transferFrom}. This is zero by default. This value changes when {approve} or {transferFrom} are called."
+				},
+				"approve(address,uint256)": {
+					"details": "Sets a `value` amount of tokens as the allowance of `spender` over the caller's tokens. Returns a boolean value indicating whether the operation succeeded. IMPORTANT: Beware that changing an allowance with this method brings the risk that someone may use both the old and the new allowance by unfortunate transaction ordering. One possible solution to mitigate this race condition is to first reduce the spender's allowance to 0 and set the desired value afterwards: https://github.com/ethereum/EIPs/issues/20#issuecomment-263524729 Emits an {Approval} event."
+				},
+				"balanceOf(address)": {
+					"details": "Returns the value of tokens owned by `account`."
+				},
+				"totalSupply()": {
+					"details": "Returns the value of tokens in existence."
+				},
+				"transfer(address,uint256)": {
+					"details": "Moves a `value` amount of tokens from the caller's account to `to`. Returns a boolean value indicating whether the operation succeeded. Emits a {Transfer} event."
+				},
+				"transferFrom(address,address,uint256)": {
+					"details": "Moves a `value` amount of tokens from `from` to `to` using the allowance mechanism. `value` is then deducted from the caller's allowance. Returns a boolean value indicating whether the operation succeeded. Emits a {Transfer} event."
 				}
 			},
 			"version": 1
@@ -214,7 +265,7 @@
 	},
 	"settings": {
 		"compilationTarget": {
-			"contracts/GHOUnicorns.sol": "GHOUnicorns"
+			"contracts/GHOUnicorns.sol": "IGHO"
 		},
 		"evmVersion": "shanghai",
 		"libraries": {},
