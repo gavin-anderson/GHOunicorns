@@ -29,16 +29,14 @@ cd nextjs-with-material-ui-example-template
 ### Install dependencies
 
 ```bash
-yarn install
-#or
-npm install
+
+npm install --force
 ```
 
 ### Start development server
 
 ```bash
-yarn dev
-#or
+
 npm run dev
 ```
 
@@ -47,16 +45,14 @@ Open [http://localhost:3000](http://localhost:3000) with your browser to see the
 ### Build for production
 
 ```bash
-yarn build
-#or
+
 npm run build
 ```
 
 ### Start preview server after build
 
 ```bash
-yarn start
-#or
+
 npm run start
 ```
 
