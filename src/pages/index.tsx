@@ -1,3 +1,4 @@
+"use client";
 import Box from "@mui/material/Box";
 import Tab from "@mui/material/Tab";
 import Tabs from "@mui/material/Tabs";
@@ -8,6 +9,8 @@ import AddBoxIcon from "@mui/icons-material/AddBox";
 import ManageHistoryIcon from "@mui/icons-material/ManageHistory";
 import NavBar from "../components/NavBar";
 import { Typography } from "@mui/material";
+
+// getting wallet address from ConnectKit API
 
 const gradient1 =
   "linear-gradient(90deg, rgba(67,79,101,1) 0%, rgba(73,116,255,1) 84%, rgba(0,212,255,1) 100%)";

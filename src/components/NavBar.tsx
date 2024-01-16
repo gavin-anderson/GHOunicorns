@@ -13,6 +13,12 @@ import Tooltip from "@mui/material/Tooltip";
 import MenuItem from "@mui/material/MenuItem";
 import AdbIcon from "@mui/icons-material/Adb";
 import WalletIcon from "@mui/icons-material/Wallet";
+import theme from "../styles/theme2.json";
+import {
+  ConnectKitProvider,
+  ConnectKitButton,
+  getDefaultConfig,
+} from "connectkit";
 
 const pages = ["Products", "Pricing", "Blog"];
 const settings = ["Profile", "Account", "Dashboard", "Logout"];
@@ -123,18 +129,32 @@ function NavBar() {
           <Box sx={{ flexGrow: 1, display: { xs: "none", md: "flex" } }}></Box>
 
           <Box sx={{ flexGrow: 0 }}>
-            <Button
-              sx={{
-                borderRadius: "50px",
-                padding: "10px",
-                background: gradient1,
-                width: "200px",
+            {/* <ConnectKitButton customTheme={theme} /> */}
+            <ConnectKitButton.Custom>
+              {({ isConnected, show, truncatedAddress, ensName }) => {
+                return (
+                  <Button
+                    onClick={show}
+                    sx={{
+                      borderRadius: "50px",
+                      padding: "10px",
+                      background: gradient1,
+                      width: "200px",
+                    }}
+                    variant="contained"
+                  >
+                    {isConnected ? (
+                      ensName ?? truncatedAddress
+                    ) : (
+                      <>
+                        <WalletIcon sx={{ marginRight: "5px" }} /> Connect
+                        Wallet
+                      </>
+                    )}
+                  </Button>
+                );
               }}
-              variant="contained"
-            >
-              <WalletIcon sx={{ marginRight: "5px" }}></WalletIcon> Connect
-              Wallet
-            </Button>
+            </ConnectKitButton.Custom>
           </Box>
         </Toolbar>
       </Container>
