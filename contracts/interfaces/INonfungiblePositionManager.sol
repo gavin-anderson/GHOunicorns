@@ -1,9 +1,9 @@
 // SPDX-License-Identifier: MIT
 pragma solidity ^0.8.0;
-pragma abicoder v2;
+// pragma abicoder v2;
 
 interface INonfungiblePositionManager {
-    struct PositionData {
+    struct PositionDetails {
         uint96 nonce;
         address operator;
         address token0;
@@ -18,5 +18,5 @@ interface INonfungiblePositionManager {
         uint128 tokensOwed1;
     }
 
-    function positions(uint256 tokenId) external view returns (address,address);
+    function positions(uint256 tokenId) external view returns (PositionDetails memory);
 }

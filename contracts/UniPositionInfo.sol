@@ -4,27 +4,23 @@ pragma solidity ^0.8.0;
 import "@uniswap/v3-core/contracts/interfaces/IUniswapV3Factory.sol";
 import "@uniswap/v3-core/contracts/interfaces/IUniswapV3Pool.sol";
 import "./interfaces/INonfungiblePositionManager.sol";
-import "./interfaces/IUniPositionInfo.sol";
 
-contract UniPositionInfo is IUniPositionInfo{
-    INonfungiblePositionManager public nonfungiblePositionManager;
+
+contract UniPositionInfo{
+    INonfungiblePositionManager public positionManager;
     IUniswapV3Factory public factory;
 
-    constructor( INonfungiblePositionManager _nonfungiblePositionManager, IUniswapV3Factory _factory) {
+    constructor(address _nonfungiblePositionManager, address _factory) {
 
-        nonfungiblePositionManager = INonfungiblePositionManager(_nonfungiblePositionManager) ;
+        positionManager = INonfungiblePositionManager(_nonfungiblePositionManager) ;
         factory = IUniswapV3Factory(_factory);
     }
 
-    function getPositionInfo(uint256 tokenId)external view returns(address, address){
+    function getPositionInfo(uint256 tokenId)external view returns(address, address, uint24, uint128){
         // Notorious Stack too deep error
-        // (, , address token0, address token1,uint24 fee, , , uint128 liquidity, , , , ) = nonfungiblePositionManager.positions(tokenId);
+        INonfungiblePositionManager.PositionDetails memory positionData = positionManager.positions(tokenId);
 
-       INonfungiblePositionManager.PositionData memory position = nonfungiblePositionManager.positions(tokenId);
-        address token0 = position.token0;
-        address token1 = position.token1;
-
-        return(token0,token1);
+        return  (positionData.token0, positionData.token1,positionData.fee,positionData.liquidity);
     }
 
     function getPrice(address token0,address token1,uint24 fee) external view returns (uint160) {
@@ -35,5 +31,5 @@ contract UniPositionInfo is IUniPositionInfo{
 
         return sqrtPriceX96;
     }
-
 }
+

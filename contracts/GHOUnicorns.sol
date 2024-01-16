@@ -3,8 +3,11 @@ pragma solidity ^0.8.0;
 
 import "@openzeppelin/contracts/token/ERC721/IERC721Receiver.sol";
 import "@openzeppelin/contracts/token/ERC20/IERC20.sol";
+import "@openzeppelin/contracts/token/ERC721/IERC721.sol";
 
+import "./interfaces/INonfungiblePositionManager.sol";
 import "./GHOToken.sol";
+import "./UniPositionInfo.sol";
 // import "./interfaces/IValuation.sol";
 // import "./interfaces/IUniPositionInfo.sol";
 
@@ -16,13 +19,14 @@ interface IGHO is IERC20 {
 
 contract GHOUnicorns is IERC721Receiver {
 
-    // Interfaces
     // Token Address
     IGHO public ghoToken;
+
     // Valuation contract
     // IValuation public evaluate;
+
     // Position Info contract
-    // IUniPositionInfo public postionInfo;
+    UniPositionInfo public positInfo;
 
     // Structure of a Deposit
     struct Deposit {
@@ -40,8 +44,9 @@ contract GHOUnicorns is IERC721Receiver {
     uint256 public constant Loan2Value = 75e16;
     uint256 public constant liquidRatio = 8e17;
 
-    constructor(IGHO _ghoToken) {
-        ghoToken = _ghoToken;
+    constructor(address _ghoToken, address _positInfo) {
+        ghoToken = IGHO(_ghoToken);
+        positInfo = UniPositionInfo(_positInfo);
     }
 
     // // ON recieve
@@ -75,29 +80,34 @@ contract GHOUnicorns is IERC721Receiver {
         uint256 tokenId,
         address from,
         uint256 _borrowedAmount
-    ) internal {}
+    ) internal {
 
-    // function closePosition(uint256 tokenId) internal {
-    //     Position storage position = positions[tokenId];
-    //     require(position.owner != address(0), "Position does not exist");
-    //     delete positions[tokenId];
-    // }
+        (address token0, address token1, uint24 fee, uint128 liquidity) = positInfo.getPositionInfo(tokenId);
+        uint256 price = positInfo.getPrice(token0, token1, fee);
+
+    }
+
+    function closePosition(uint256 tokenId) internal {
+        Deposit storage depositPosition = deposits[tokenId];
+        require(depositPosition.owner != address(0), "Position does not exist");
+        delete deposits[tokenId];
+    }
 
     // function payback(uint256 tokenId) public {
     //     // partial payback can help loan health/ if fully paid back sent nft back to owner. Money needs to be sent in same transaction.
     //     uint256 ghoOwned = ghoToken.balanceOf(address(this));
     //     require(ghoOwned > 0, "No GHO sent");
-    //     Position storage position = positions[tokenId];
+    //     Deposit storage depositPosition = deposits[tokenId];
 
-    //     if (position.borrowedAmount > ghoOwned) {
+    //     if (depositPosition.borrowedAmount > ghoOwned) {
     //         ghoToken.burn(address(this), ghoOwned);
-    //         position.borrowedAmount = position.borrowedAmount - ghoOwned;
+    //         depositPosition.borrowedAmount = depositPosition.borrowedAmount - ghoOwned;
     //     } else {
 
-    //         if (position.borrowedAmount*scalingFactor/position.value>=liquidRatio){
+    //         if (depositPosition.borrowedAmount*scalingFactor/depositPosition.value>=liquidRatio){
 
     //             ghoToken.burn(address(this), ghoOwned);
-    //             nonfungiblePositionManager.safeTransferFrom(
+    //             IERC721(positInfo.positionManager()).safeTransferFrom(
     //             address(this),
     //             msg.sender,
     //             tokenId,
@@ -107,9 +117,9 @@ contract GHOUnicorns is IERC721Receiver {
 
     //         }else{
     //         ghoToken.burn(address(this), ghoOwned);
-    //         nonfungiblePositionManager.safeTransferFrom(
+    //          IERC721(positInfo.positionManager()).safeTransferFrom(
     //             address(this),
-    //             position.owner,
+    //             depositPosition,
     //             tokenId,
     //             ""
     //         );
