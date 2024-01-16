@@ -1,13 +1,12 @@
 // SPDX-License-Identifier: MIT
 pragma solidity ^0.8.0;
 
-import "https://github.com/OpenZeppelin/openzeppelin-contracts/blob/master/contracts/token/ERC721/IERC721Receiver.sol";
-import "https://github.com/OpenZeppelin/openzeppelin-contracts/blob/master/contracts/token/ERC20/IERC20.sol";
-import "https://github.com/Uniswap/v3-periphery/blob/main/contracts/libraries/PoolAddress.sol";
-import "https://github.com/Uniswap/v3-periphery/blob/main/contracts/interfaces/INonfungiblePositionManager.sol";
-import "https://github.com/Uniswap/v3-core/blob/main/contracts/interfaces/IUniswapV3Pool.sol";
+import "@openzeppelin/contracts/token/ERC721/IERC721Receiver.sol";
+import "@openzeppelin/contracts/token/ERC20/IERC20.sol";
 
-import "contracts/GHOToken.sol";
+import "./GHOToken.sol";
+// import "./interfaces/IValuation.sol";
+// import "./interfaces/IUniPositionInfo.sol";
 
 interface IGHO is IERC20 {
     function mint(address to, uint256 amount) external;
@@ -16,15 +15,16 @@ interface IGHO is IERC20 {
 }
 
 contract GHOUnicorns is IERC721Receiver {
-    // Uniswap V3 Factory address
-    address public constant uniswapV3Factory =
-        0x1F98431c8aD98523631AE4a59f267346ea31F984;
+
+    // Interfaces
     // Token Address
     IGHO public ghoToken;
-    // Uniswap NFT Manager
-    INonfungiblePositionManager public immutable nonfungiblePositionManager;
-    // 0xC36442b4a4522E871399CD717aBDD847Ab11FE88
-    // Structure of a position
+    // Valuation contract
+    // IValuation public evaluate;
+    // Position Info contract
+    // IUniPositionInfo public postionInfo;
+
+    // Structure of a Deposit
     struct Deposit {
         uint256 value;
         uint256 borrowedAmount;
@@ -37,19 +37,14 @@ contract GHOUnicorns is IERC721Receiver {
 
     // Math purposes
     uint256 public constant scalingFactor = 1e18;
-
     uint256 public constant Loan2Value = 75e16;
     uint256 public constant liquidRatio = 8e17;
 
-    constructor(
-        IGHO _ghoToken,
-        INonfungiblePositionManager _nonfungiblePositionManager
-    ) {
+    constructor(IGHO _ghoToken) {
         ghoToken = _ghoToken;
-        nonfungiblePositionManager = _nonfungiblePositionManager;
     }
 
-    // // Main function for handeling new positions
+    // // ON recieve
     function onERC721Received(
         address operator,
         address from,
@@ -75,30 +70,12 @@ contract GHOUnicorns is IERC721Receiver {
             owner: from
         });
     }
-    
-    function newDeposit(uint256 tokenId, address from, uint256 _borrowedAmount)internal{
-        (address token0, address token1,uint24 fee, uint128 liquidity) = getPositionInfo(tokenId);
 
-    }
-
-
-    function getPositionInfo(uint256 tokenId)internal view returns(address token0,address token1,uint24 fee, uint128 liquidity){
-        ( , ,address _token0,address _token1,uint24 _fee,,,uint128 liquidity,,,,) = nonfungiblePositionManager.positions(tokenId);
-        return (_token0, _token1, _fee, liquidity);
-    }
-
-    function valuation(address token0,address token1,uint24 fee,uint128 liquidity,uint256 priceData) internal pure returns (uint160) {
-        // value = price of token0* qty of token0 + price of token1*qty of token1
-        return 0;
-    }
-
-    function getPrice(address token0,address token1,uint24 fee) internal view returns (uint160) {
-        PoolAddress.PoolKey memory key = PoolAddress.getPoolKey(token0,token1,fee);
-        address poolAddress = PoolAddress.computeAddress(uniswapV3Factory, key);
-        IUniswapV3Pool pool = IUniswapV3Pool(poolAddress);
-        (uint160 sqrtPriceX96, , , , , , ) = pool.slot0();
-        return sqrtPriceX96;
-    }
+    function newDeposit(
+        uint256 tokenId,
+        address from,
+        uint256 _borrowedAmount
+    ) internal {}
 
     // function closePosition(uint256 tokenId) internal {
     //     Position storage position = positions[tokenId];
