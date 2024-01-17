@@ -8,8 +8,7 @@ import "@openzeppelin/contracts/token/ERC721/IERC721.sol";
 import "./interfaces/INonfungiblePositionManager.sol";
 import "./GHOToken.sol";
 import "./UniPositionInfo.sol";
-// import "./interfaces/IValuation.sol";
-// import "./interfaces/IUniPositionInfo.sol";
+
 
 interface IGHO is IERC20 {
     function mint(address to, uint256 amount) external;
@@ -21,9 +20,6 @@ contract GHOUnicorns is IERC721Receiver {
 
     // Token Address
     IGHO public ghoToken;
-
-    // Valuation contract
-    // IValuation public evaluate;
 
     // Position Info contract
     UniPositionInfo public positInfo;
