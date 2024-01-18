@@ -1,5 +1,5 @@
 // SPDX-License-Identifier: MIT
-pragma solidity ^0.8.0;
+pragma solidity ^0.7.6;
 
 import "@openzeppelin/contracts/token/ERC721/IERC721Receiver.sol";
 import "@openzeppelin/contracts/token/ERC20/IERC20.sol";
@@ -78,9 +78,7 @@ contract GHOUnicorns is IERC721Receiver {
         uint256 _borrowedAmount
     ) internal {
 
-        (address token0, address token1, uint24 fee, uint128 liquidity) = positInfo.getPositionInfo(tokenId);
-        uint256 price = positInfo.getPrice(token0, token1, fee);
-
+     
     }
 
     function closePosition(uint256 tokenId) internal {

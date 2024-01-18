@@ -1,10 +1,16 @@
 // SPDX-License-Identifier: MIT
-pragma solidity ^0.8.0;
+pragma solidity ^0.7.6;
+pragma abicoder v2;
 
 import "@uniswap/v3-core/contracts/interfaces/IUniswapV3Factory.sol";
-// import "@uniswap/v3-core/contracts/interfaces/IUniswapV3Pool.sol";
+import "./interfaces/IUniswapV3Pool.sol";
 import "./interfaces/INonfungiblePositionManager.sol";
 import "@uniswap/v3-core/contracts/libraries/TickMath.sol";
+import "@uniswap/v3-periphery/contracts/libraries/LiquidityAmounts.sol";
+import "@uniswap/v3-core/contracts/libraries/TickMath.sol";
+import "@uniswap/v3-core/contracts/libraries/FixedPoint96.sol";
+import "@uniswap/v3-core/contracts/libraries/FullMath.sol";
+
 
 contract UniPositionInfo{
     INonfungiblePositionManager public positionManager;
@@ -36,7 +42,7 @@ contract UniPositionInfo{
         return(sqrtPriceX96,tick);
     }
 
-    function tokenAmount(uint160 sqrtPriceX96, int24 tick, int24 tickLower, int24 tickUpper) internal view returns(uint256,uint256) {
+    function tokenAmount(uint128 liquidity, int24 tick, int24 tickLower, int24 tickUpper) external view returns(uint256 amount0 ,uint256 amount1) {
         (amount0,amount1) = LiquidityAmounts.getAmountsForLiquidity(
             TickMath.getSqrtRatioAtTick(tick),
             TickMath.getSqrtRatioAtTick(tickLower),
@@ -44,6 +50,23 @@ contract UniPositionInfo{
             liquidity
         );
         return(amount0,amount1);
+    }
+
+    function getTWAP(address poolAddress, uint32 timeInterval) external view returns (uint256) {
+        IUniswapV3Pool pool = IUniswapV3Pool(poolAddress);
+
+        // Time intervals: current and past
+        uint32[] memory secondsAgos = new uint32[](2);
+        secondsAgos[0] = 0; // Current time
+        secondsAgos[1] = timeInterval; // Time interval ago
+
+        // Get cumulative ticks
+        (int56[] memory tickCumulatives,) = pool.observe(secondsAgos);
+
+        uint160 sqrtPriceX96 = TickMath.getSqrtRatioAtTick( int24((tickCumulatives[1] - tickCumulatives[0]) / timeInterval));
+        uint256 priceX96 = FullMath.mulDiv(sqrtPriceX96, sqrtPriceX96, FixedPoint96.Q96);
+        return priceX96;
+       
     }
 }
 
