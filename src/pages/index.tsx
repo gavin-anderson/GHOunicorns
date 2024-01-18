@@ -3,17 +3,17 @@ import Box from "@mui/material/Box";
 import Tab from "@mui/material/Tab";
 import Tabs from "@mui/material/Tabs";
 import Paper from "@mui/material/Paper";
-import React, { useState } from "react";
+import React, { useState, useEffect } from "react";
 import { styled } from "@mui/material/styles";
 import AddBoxIcon from "@mui/icons-material/AddBox";
 import ManageHistoryIcon from "@mui/icons-material/ManageHistory";
 import NavBar from "../components/NavBar";
 import { Typography } from "@mui/material";
+import getContractFactory from "ethers"
 
-// getting wallet address from ConnectKit API
+import { useAccount } from "wagmi";
 
-const gradient1 =
-  "linear-gradient(90deg, rgba(67,79,101,1) 0%, rgba(73,116,255,1) 84%, rgba(0,212,255,1) 100%)";
+
 
 const CustomTab = styled(Tab)({
   minWidth: 300, // adjust as needed
@@ -53,14 +53,28 @@ const CustomTabs = styled(Tabs)({
 
 export default function HomePage() {
   const [value, setValue] = useState(0);
+  const [walletAddress, setWalletAddress] = useState("") 
+  const { address, isConnecting, isDisconnected } = useAccount();
+
+  useEffect(() => {
+    setWalletAddress(address || "")
+  }, [address]);
+  
+  console.log(walletAddress, "HSHHSHSH")
+  
+
 
   const handleChange = (event, newValue) => {
     setValue(newValue);
   };
 
+  useEffect(() => {
+   
+}, []);
+
   return (
     <>
-      <NavBar></NavBar>
+      <NavBar ></NavBar>
       <Box
         sx={{
           flexGrow: 1,
@@ -122,7 +136,8 @@ export default function HomePage() {
             }}
           >
             {value === 0 && (
-              <Box>
+              <div>
+                {walletAddress !== "" ? (<Box>
                 <Box sx={{ position: "relative", zIndex: 1 }}>
                   {/* Icon and the rest of your content */}
                   <Box sx={{ display: "flex", alignItems: "center", mb: 2 }}>
@@ -140,7 +155,20 @@ export default function HomePage() {
                   <Typography variant="body2">F Alexandra</Typography>
                   <Typography variant="body2">05/24</Typography>
                 </Box>
-              </Box>
+              </Box>) : <div>
+              <Typography variant="h5" sx={{ fontWeight: "bold" }}>
+                    Please connect your wallet.
+                  </Typography>
+              <Typography  variant="subtitle1" gutterBottom>
+                      In order to see valid positions to borrow GHO against, you must connect a wallet.
+                    </Typography>
+              </div>
+
+              
+              
+              }
+              </div>
+              
             )}
             {value === 1 && <Box>Content for Manage</Box>}
           </Paper>

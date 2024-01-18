@@ -14,16 +14,22 @@ import MenuItem from "@mui/material/MenuItem";
 import AdbIcon from "@mui/icons-material/Adb";
 import WalletIcon from "@mui/icons-material/Wallet";
 import theme from "../styles/theme2.json";
+import { useContext, useEffect } from "react";
 import {
   ConnectKitProvider,
   ConnectKitButton,
   getDefaultConfig,
 } from "connectkit";
 
+
 const pages = ["Products", "Pricing", "Blog"];
 const settings = ["Profile", "Account", "Dashboard", "Logout"];
 
 function NavBar() {
+ 
+  
+
+
   const [anchorElNav, setAnchorElNav] = React.useState<null | HTMLElement>(
     null
   );
@@ -130,11 +136,12 @@ function NavBar() {
 
           <Box sx={{ flexGrow: 0 }}>
             {/* <ConnectKitButton customTheme={theme} /> */}
-            <ConnectKitButton.Custom>
+            <ConnectKitButton.Custom >
               {({ isConnected, show, truncatedAddress, ensName }) => {
                 return (
                   <Button
                     onClick={show}
+                    
                     sx={{
                       borderRadius: "50px",
                       padding: "10px",
