@@ -1,15 +1,17 @@
 // SPDX-License-Identifier: MIT
-pragma solidity ^0.7.6;
+pragma solidity =0.7.6;
 pragma abicoder v2;
 
 import "@uniswap/v3-core/contracts/interfaces/IUniswapV3Factory.sol";
-import "./interfaces/IUniswapV3Pool.sol";
-import "./interfaces/INonfungiblePositionManager.sol";
 import "@uniswap/v3-core/contracts/libraries/TickMath.sol";
 import "@uniswap/v3-periphery/contracts/libraries/LiquidityAmounts.sol";
 import "@uniswap/v3-core/contracts/libraries/TickMath.sol";
 import "@uniswap/v3-core/contracts/libraries/FixedPoint96.sol";
 import "@uniswap/v3-core/contracts/libraries/FullMath.sol";
+
+import "./interfaces/IUniswapV3Pool.sol";
+import "./interfaces/INonfungiblePositionManager.sol";
+
 
 
 contract UniPositionInfo{
@@ -36,20 +38,20 @@ contract UniPositionInfo{
         return poolAdd;
     }
 
-    function getSqrtPrice(address poolAdd) external view returns (uint160, int24) {
+    function getCurrentTick(address poolAdd) external view returns (int24) {
         IUniswapV3Pool pool = IUniswapV3Pool(poolAdd);
-        (uint160 sqrtPriceX96, int24 tick, , , , , ) = pool.slot0();
-        return(sqrtPriceX96,tick);
+        (, int24 tick, , , , , ) = pool.slot0();
+        return(tick);
     }
 
-    function tokenAmount(uint128 liquidity, int24 tick, int24 tickLower, int24 tickUpper) external view returns(uint256 amount0 ,uint256 amount1) {
+    function tokenAmount(uint128 liquidity, int24 tick, int24 tickLower, int24 tickUpper) external pure returns(uint256 amount0 ,uint256 amount1) {
         (amount0,amount1) = LiquidityAmounts.getAmountsForLiquidity(
             TickMath.getSqrtRatioAtTick(tick),
             TickMath.getSqrtRatioAtTick(tickLower),
             TickMath.getSqrtRatioAtTick(tickUpper),
             liquidity
         );
-        return(amount0,amount1);
+        return(amount0/1e12,amount1/1e12);
     }
 
     function getTWAP(address poolAddress, uint32 timeInterval) external view returns (uint256) {
@@ -65,8 +67,20 @@ contract UniPositionInfo{
 
         uint160 sqrtPriceX96 = TickMath.getSqrtRatioAtTick( int24((tickCumulatives[1] - tickCumulatives[0]) / timeInterval));
         uint256 priceX96 = FullMath.mulDiv(sqrtPriceX96, sqrtPriceX96, FixedPoint96.Q96);
-        return priceX96;
+        uint256 gPrice= (priceX96*1e6)/2**96;
+        return gPrice;
        
+    }
+
+    function valueCalc(uint256 amount0, uint256 amount1, uint256 gPrice) external pure returns(uint256 fValue){
+        
+        if(gPrice<1e6){
+            fValue = amount1 + gPrice*amount0;
+        }else{
+            fValue = amount0 + gPrice*amount1;
+        }
+        return fValue;
+        
     }
 }
 
