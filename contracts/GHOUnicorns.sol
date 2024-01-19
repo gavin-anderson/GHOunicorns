@@ -7,6 +7,8 @@ import "@openzeppelin/contracts/token/ERC721/IERC721.sol";
 
 // import "./interfaces/INonfungiblePositionManager.sol";
 import "./interfaces/IUniPositionInfo.sol";
+
+import"./interfaces/IValuation.sol";
 // import "./GHOToken.sol";
 
 // interface IGHO is IERC20 {
@@ -22,12 +24,12 @@ contract GHOUnicorns is IERC721Receiver {
 
     // // Position Info contract
     IUniPositionInfo public positInfo;
+    IValuation public positVal;
 
     // Structure of a Deposit
     struct Deposit {
         uint256 value;
         uint256 borrowedAmount;
-        uint256 feesIncurred;
         address owner;
     }
 
@@ -35,12 +37,13 @@ contract GHOUnicorns is IERC721Receiver {
     mapping(uint256 => Deposit) public deposits;
 
     // Math purposes
-    uint256 public constant Loan2Value = 75e4;
-    uint256 public constant liquidRatio = 8e5;
+    uint256 public constant Loan2Value = 75e16;
+    uint256 public constant liquidRatio = 8e17;
 
-    constructor(address _positInfo) {
+    constructor(address _positInfo, address _positVal) {
         // ghoToken = IGHO(_ghoToken);
         positInfo = IUniPositionInfo(_positInfo);
+        positVal = IValuation(_positVal);
     }
 
     // // ON recieve
@@ -50,9 +53,7 @@ contract GHOUnicorns is IERC721Receiver {
         uint256 tokenId,
         bytes calldata data
     ) public override returns (bytes4) {
-        require(data.length > 0, "No requested loan amount.");
-        uint256 requestedLoanAmount = abi.decode(data, (uint24));
-        newDeposit(tokenId, from, requestedLoanAmount);
+       
         return this.onERC721Received.selector;
     }
 
@@ -65,31 +66,8 @@ contract GHOUnicorns is IERC721Receiver {
         deposits[tokenId] = Deposit({
             value: _value,
             borrowedAmount: _borrowedAmount,
-            feesIncurred: 0,
             owner: from
         });
-    }
-
-    function newDeposit(
-        uint256 tokenId,
-        address from,
-        uint256 _borrowedAmount
-    ) public {
-        uint256 amount0;
-        uint256 amount1;
-        address poolAdd;
-
-        { 
-            (address token0, address token1, uint24 fee, uint128 liquidity, int24 tickLower, int24 tickUpper) = positInfo.getPositionInfo(tokenId);
-            poolAdd = positInfo.getPool(token0,token1,fee);
-            int24 currTick = positInfo.getCurrentTick(poolAdd);
-            (amount0,amount1) = positInfo.tokenAmount(liquidity,currTick,tickLower,tickUpper);
-        }
-        
-        uint256 fValue = positInfo.getTWAP(poolAdd,250,amount0,amount1);
-        require(_borrowedAmount/fValue <Loan2Value, "Borrowing Too Much");
-        openPosition(tokenId,fValue,_borrowedAmount,from);
-     
     }
 
     function closePosition(uint256 tokenId) internal {
@@ -97,6 +75,30 @@ contract GHOUnicorns is IERC721Receiver {
         require(depositPosition.owner != address(0), "Position does not exist");
         delete deposits[tokenId];
     }
+
+    function newDeposit(
+        uint256 tokenId,
+        uint256 _borrowedAmount
+    ) public{
+        // IERC721(positInfo.positionManager()).safeTransferFrom(msg.sender,address(this),tokenId);
+        uint256 fValue = getValue(tokenId);
+        require(_borrowedAmount/fValue <Loan2Value, "Borrowing Too Much");
+        openPosition(tokenId,fValue,_borrowedAmount,msg.sender);
+        // GHO _mint
+     
+    }
+
+    function getValue(uint256 tokenId)internal view returns(uint256 fValue){
+        (uint256 amount0,uint256 amount1,address token0,address token1, address poolAdd) = positInfo.getPositionInfo(tokenId); 
+        uint256 gPrice = positInfo.getTWAP(poolAdd,250);
+        fValue = positVal.evaluate(token0, token1,  gPrice, amount0, amount1);
+        
+    }
+
+
+
+
+    
 
 //    function payback(uint256 tokenId) public {
 //         // partial payback can help loan health/ if fully paid back sent nft back to owner. Money needs to be sent in same transaction.

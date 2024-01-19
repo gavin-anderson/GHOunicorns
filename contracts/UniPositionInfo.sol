@@ -9,6 +9,7 @@ import "@uniswap/v3-core/contracts/libraries/TickMath.sol";
 import "@uniswap/v3-core/contracts/libraries/FixedPoint96.sol";
 import "@uniswap/v3-core/contracts/libraries/FullMath.sol";
 
+
 import "./interfaces/IUniswapV3Pool.sol";
 import "./interfaces/INonfungiblePositionManager.sol";
 
@@ -31,34 +32,28 @@ contract UniPositionInfo{
     }
     
 
-    function getPositionInfo(uint256 tokenId)external view returns(address, address, uint24, uint128,int24,int24){
+    function getPositionInfo(uint256 tokenId)public view returns(uint256 amount0, uint256 amount1, address token0, address token1, address poolAdd){
         // Notorious Stack too deep error
         INonfungiblePositionManager.PositionDetails memory positionData = positionManager.positions(tokenId);
-        return  (positionData.token0, positionData.token1,positionData.fee,positionData.liquidity, positionData.tickLower,positionData.tickUpper);
-    }
 
-    function getPool(address token0,address token1,uint24 fee) external view returns (address){
-        address poolAdd = factory.getPool(token0,token1,fee);
-        return poolAdd;
-    }
+        poolAdd = factory.getPool(positionData.token0,positionData.token1,positionData.fee);
 
-    function getCurrentTick(address poolAdd) external view returns (int24) {
         IUniswapV3Pool pool = IUniswapV3Pool(poolAdd);
         (, int24 tick, , , , , ) = pool.slot0();
-        return(tick);
-    }
 
-    function tokenAmount(uint128 liquidity, int24 tick, int24 tickLower, int24 tickUpper) external pure returns(uint256 amount0 ,uint256 amount1) {
-        (amount0,amount1) = LiquidityAmounts.getAmountsForLiquidity(
+         (amount0,amount1) = LiquidityAmounts.getAmountsForLiquidity(
             TickMath.getSqrtRatioAtTick(tick),
-            TickMath.getSqrtRatioAtTick(tickLower),
-            TickMath.getSqrtRatioAtTick(tickUpper),
-            liquidity
+            TickMath.getSqrtRatioAtTick(positionData.tickLower),
+            TickMath.getSqrtRatioAtTick(positionData.tickUpper),
+            positionData.liquidity
         );
-        return(amount0/1e12,amount1/1e12);
+        return  (amount0,amount1,positionData.token0,positionData.token1, poolAdd);
+
+        
     }
 
-    function getTWAP(address poolAddress, uint32 timeInterval, uint256 amount0, uint256 amount1) external view returns (uint256 fValue) {
+
+    function getTWAP(address poolAddress, uint32 timeInterval) external view returns ( uint256 gPrice) {
         IUniswapV3Pool pool = IUniswapV3Pool(poolAddress);
 
         // Time intervals: current and past
@@ -70,27 +65,16 @@ contract UniPositionInfo{
         (int56[] memory tickCumulatives,) = pool.observe(secondsAgos);
 
         uint160 sqrtPriceX96 = TickMath.getSqrtRatioAtTick( int24((tickCumulatives[1] - tickCumulatives[0]) / timeInterval));
-        uint256 priceX96 = FullMath.mulDiv(sqrtPriceX96, sqrtPriceX96, FixedPoint96.Q96);
-        uint256 gPrice= (priceX96*1e6)/2**96;
 
-        if(gPrice<1e6){
-            fValue = amount1 + gPrice*amount0;
-        }else{
-            fValue = amount0 + gPrice*amount1;
-        }
-        return fValue;
+        uint256 priceX96 = FullMath.mulDiv(sqrtPriceX96, sqrtPriceX96, FixedPoint96.Q96);
+        gPrice= (priceX96*1e18)/2**96;
+
+        
+        return(gPrice);
        
     }
 
-//     function valueCalc(uint256 amount0, uint256 amount1, uint256 gPrice) external pure returns(uint256 fValue){
-        
-//         if(gPrice<1e6){
-//             fValue = amount1 + gPrice*amount0;
-//         }else{
-//             fValue = amount0 + gPrice*amount1;
-//         }
-//         return fValue;
-        
-//     }
+
 }
+
 
