@@ -9,11 +9,8 @@ import AddBoxIcon from "@mui/icons-material/AddBox";
 import ManageHistoryIcon from "@mui/icons-material/ManageHistory";
 import NavBar from "../components/NavBar";
 import { Typography } from "@mui/material";
-import getContractFactory from "ethers"
-
+import ValidPositions from "../components/ValidPositions";
 import { useAccount } from "wagmi";
-
-
 
 const CustomTab = styled(Tab)({
   minWidth: 300, // adjust as needed
@@ -53,28 +50,20 @@ const CustomTabs = styled(Tabs)({
 
 export default function HomePage() {
   const [value, setValue] = useState(0);
-  const [walletAddress, setWalletAddress] = useState("") 
+  const [walletAddress, setWalletAddress] = useState("");
   const { address, isConnecting, isDisconnected } = useAccount();
 
   useEffect(() => {
-    setWalletAddress(address || "")
+    setWalletAddress(address || "");
   }, [address]);
-  
-  console.log(walletAddress, "HSHHSHSH")
-  
-
 
   const handleChange = (event, newValue) => {
     setValue(newValue);
   };
 
-  useEffect(() => {
-   
-}, []);
-
   return (
     <>
-      <NavBar ></NavBar>
+      <NavBar></NavBar>
       <Box
         sx={{
           flexGrow: 1,
@@ -137,38 +126,33 @@ export default function HomePage() {
           >
             {value === 0 && (
               <div>
-                {walletAddress !== "" ? (<Box>
-                <Box sx={{ position: "relative", zIndex: 1 }}>
-                  {/* Icon and the rest of your content */}
-                  <Box sx={{ display: "flex", alignItems: "center", mb: 2 }}>
-                    {/* <CreditCardIcon sx={{ fontSize: 'large', mr: 1 }} /> */}
-                    <Typography variant="subtitle1" gutterBottom>
-                      VISA
-                    </Typography>
-                  </Box>
-                  <Typography variant="h5" sx={{ fontWeight: "bold" }}>
-                    Active Balance
-                  </Typography>
-                  <Typography variant="h4" sx={{ my: 1 }}>
-                    € 45.720
-                  </Typography>
-                  <Typography variant="body2">F Alexandra</Typography>
-                  <Typography variant="body2">05/24</Typography>
-                </Box>
-              </Box>) : <div>
-              <Typography variant="h5" sx={{ fontWeight: "bold" }}>
-                    Please connect your wallet.
-                  </Typography>
-              <Typography  variant="subtitle1" gutterBottom>
-                      In order to see valid positions to borrow GHO against, you must connect a wallet.
-                    </Typography>
+                {walletAddress !== "" ? (
+                  <ValidPositions
+                    walletAddress={walletAddress}
+                  ></ValidPositions>
+                ) : (
+                  <div>
+                    <Paper
+                      sx={{
+                        justifyContent: "center",
+                        alignItems: "center",
+                        borderRadius: "30px",
+                        background: "#0e1a2e",
+                        padding: "30px",
+                        color: "white",
+                      }}
+                    >
+                      <Typography variant="h5" sx={{ fontWeight: "bold" }}>
+                        Please connect your wallet.
+                      </Typography>
+                      <Typography variant="subtitle1" gutterBottom>
+                        In order to see valid positions to borrow GHO against,
+                        you must connect a wallet.
+                      </Typography>
+                    </Paper>
+                  </div>
+                )}
               </div>
-
-              
-              
-              }
-              </div>
-              
             )}
             {value === 1 && <Box>Content for Manage</Box>}
           </Paper>

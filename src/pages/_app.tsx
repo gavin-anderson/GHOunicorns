@@ -2,25 +2,17 @@ import "../styles/globals.css";
 
 import type { AppProps } from "next/app";
 import { WagmiConfig, createConfig } from "wagmi";
-
-import {
-  ConnectKitProvider,
-  ConnectKitButton,
-  getDefaultConfig,
-} from "connectkit";
-import { useAccount } from "wagmi";
+import { mainnet, polygon, optimism, arbitrum } from "wagmi/chains";
+import { ConnectKitProvider, getDefaultConfig } from "connectkit";
 import theme from "../styles/theme.json";
 
 const config = createConfig(
   getDefaultConfig({
-    // Required API Keys
-    alchemyId: process.env.INFURA_ID, // or infuraId
-    walletConnectProjectId: process.env.WALLET_CONNECT_ID,
+    appName: "ConnectKit Next.js demo",
+    //infuraId: process.env.NEXT_PUBLIC_INFURA_ID,
+    //alchemyId:  process.env.NEXT_PUBLIC_ALCHEMY_ID,
 
-    // Required
-    appName: "GHOunicorns",
-
-    // Optional
+    walletConnectProjectId: process.env.WALLET_CONNECT_ID!,
   })
 );
 
@@ -28,7 +20,7 @@ export default function App({ Component, pageProps }: AppProps) {
   const AnyComponent = Component as any;
   return (
     <WagmiConfig config={config}>
-      <ConnectKitProvider customTheme={theme} debugMode>
+      <ConnectKitProvider customTheme={theme}>
         <AnyComponent {...pageProps} />
       </ConnectKitProvider>
     </WagmiConfig>
