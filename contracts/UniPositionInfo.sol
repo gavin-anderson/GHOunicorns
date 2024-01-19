@@ -21,9 +21,13 @@ contract UniPositionInfo{
     constructor(address _nonfungiblePositionManager, address _factory) {
 
         positionManager = INonfungiblePositionManager(_nonfungiblePositionManager);
-        // 0xC36442b4a4522E871399CD717aBDD847Ab11FE88
+        // 0xC36442b4a4522E871399CD717aBDD847Ab11FE88 Go
+        // 0x1238536071E1c677A632429e3655c799b22cDA52 sep
+
+
         factory = IUniswapV3Factory(_factory);
-        // 0x1F98431c8aD98523631AE4a59f267346ea31F984
+        // 0x1F98431c8aD98523631AE4a59f267346ea31F984 Go
+        //  0x0227628f3F023bb0B980b67D528571c95c6DaC1c sep
     }
     
 

@@ -32,7 +32,7 @@ contract GHOUnicorns is IERC721Receiver {
     }
 
     //Track all Positions made
-    mapping(uint256 => Deposit) deposits;
+    mapping(uint256 => Deposit) public deposits;
 
     // Math purposes
     uint256 public constant Loan2Value = 75e4;
@@ -87,6 +87,7 @@ contract GHOUnicorns is IERC721Receiver {
         }
         
         uint256 fValue = positInfo.getTWAP(poolAdd,250,amount0,amount1);
+        require(_borrowedAmount/fValue <Loan2Value, "Borrowing Too Much");
         openPosition(tokenId,fValue,_borrowedAmount,from);
      
     }
@@ -97,36 +98,36 @@ contract GHOUnicorns is IERC721Receiver {
         delete deposits[tokenId];
     }
 
-   function payback(uint256 tokenId) public {
-        // partial payback can help loan health/ if fully paid back sent nft back to owner. Money needs to be sent in same transaction.
-        uint256 ghoOwned = ghoToken.balanceOf(address(this));
-        require(ghoOwned > 0, "No GHO sent");
-        Deposit storage depositPosition = deposits[tokenId];
+//    function payback(uint256 tokenId) public {
+//         // partial payback can help loan health/ if fully paid back sent nft back to owner. Money needs to be sent in same transaction.
+//         uint256 ghoOwned = ghoToken.balanceOf(address(this));
+//         require(ghoOwned > 0, "No GHO sent");
+//         Deposit storage depositPosition = deposits[tokenId];
 
-        if (depositPosition.borrowedAmount > ghoOwned) {
-            ghoToken.burn(address(this), ghoOwned);
-            depositPosition.borrowedAmount = depositPosition.borrowedAmount - ghoOwned*1e6;
-        } else {
+//         if (depositPosition.borrowedAmount > ghoOwned) {
+//             ghoToken.burn(address(this), ghoOwned);
+//             depositPosition.borrowedAmount = depositPosition.borrowedAmount - ghoOwned*1e6;
+//         } else {
 
-            if (depositPosition.borrowedAmount*1e6/depositPosition.value>=liquidRatio){
+//             if (depositPosition.borrowedAmount*1e6/depositPosition.value>=liquidRatio){
 
-                ghoToken.burn(address(this), ghoOwned);
-                IERC721(positInfo.positionManager()).safeTransferFrom(
-                address(this),
-                msg.sender,
-                tokenId
-            );
-            closePosition(tokenId);
+//                 ghoToken.burn(address(this), ghoOwned);
+//                 IERC721(positInfo.positionManager()).safeTransferFrom(
+//                 address(this),
+//                 msg.sender,
+//                 tokenId
+//             );
+//             closePosition(tokenId);
 
-            }else{
-                ghoToken.burn(address(this), ghoOwned);
-                IERC721(positInfo.positionManager()).safeTransferFrom(
-                address(this),
-                depositPosition.owner,
-                tokenId
-            );
-            closePosition(tokenId);
-            }
-        }
-    }
+//             }else{
+//                 ghoToken.burn(address(this), ghoOwned);
+//                 IERC721(positInfo.positionManager()).safeTransferFrom(
+//                 address(this),
+//                 depositPosition.owner,
+//                 tokenId
+//             );
+//             closePosition(tokenId);
+//             }
+//         }
+//     }
 }
