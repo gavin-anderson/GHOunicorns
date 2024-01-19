@@ -7,18 +7,18 @@ import "@openzeppelin/contracts/token/ERC721/IERC721.sol";
 
 // import "./interfaces/INonfungiblePositionManager.sol";
 import "./interfaces/IUniPositionInfo.sol";
-import "./GHOToken.sol";
+// import "./GHOToken.sol";
 
-interface IGHO is IERC20 {
-    function mint(address to, uint256 amount) external;
+// interface IGHO is IERC20 {
+//     function mint(address to, uint256 amount) external;
 
-    function burn(address from, uint256 amount) external;
-}
+//     function burn(address from, uint256 amount) external;
+// }
 
 contract GHOUnicorns is IERC721Receiver {
 
     // Token Address
-    IGHO public ghoToken;
+    // IGHO public ghoToken;
 
     // // Position Info contract
     IUniPositionInfo public positInfo;
@@ -35,12 +35,11 @@ contract GHOUnicorns is IERC721Receiver {
     mapping(uint256 => Deposit) deposits;
 
     // Math purposes
-    uint256 public constant scalingFactor = 1e18;
-    uint256 public constant Loan2Value = 75e16;
-    uint256 public constant liquidRatio = 8e17;
+    uint256 public constant Loan2Value = 75e4;
+    uint256 public constant liquidRatio = 8e5;
 
-    constructor(address _ghoToken, address _positInfo) {
-        ghoToken = IGHO(_ghoToken);
+    constructor(address _positInfo) {
+        // ghoToken = IGHO(_ghoToken);
         positInfo = IUniPositionInfo(_positInfo);
     }
 
@@ -59,7 +58,7 @@ contract GHOUnicorns is IERC721Receiver {
 
     function openPosition(
         uint256 tokenId,
-        uint160 _value,
+        uint256 _value,
         uint256 _borrowedAmount,
         address from
     ) internal {
@@ -75,13 +74,20 @@ contract GHOUnicorns is IERC721Receiver {
         uint256 tokenId,
         address from,
         uint256 _borrowedAmount
-    ) internal {
-        (address token0, address token1, uint24 fee, uint128 liquidity, int24 tickLower, int24 tickUpper) = positInfo.getPositionInfo(tokenId);
-        address poolAdd = positInfo.getPool(token0,token1,fee);
-        int24 currTick = positInfo.getCurrentTick(poolAdd);
-        (uint256 amount0,uint256 amount1) = positInfo.tokenAmount(liquidity,currTick,tickLower,tickUpper);
-        uint256 priceX96 = positInfo.getTWAP(poolAdd,250);
-        uint256 fValue = positInfo.valueCalc(amount0,amount1,priceX96);
+    ) public {
+        uint256 amount0;
+        uint256 amount1;
+        address poolAdd;
+
+        { 
+            (address token0, address token1, uint24 fee, uint128 liquidity, int24 tickLower, int24 tickUpper) = positInfo.getPositionInfo(tokenId);
+            poolAdd = positInfo.getPool(token0,token1,fee);
+            int24 currTick = positInfo.getCurrentTick(poolAdd);
+            (amount0,amount1) = positInfo.tokenAmount(liquidity,currTick,tickLower,tickUpper);
+        }
+        
+        uint256 fValue = positInfo.getTWAP(poolAdd,250,amount0,amount1);
+        openPosition(tokenId,fValue,_borrowedAmount,from);
      
     }
 
@@ -99,10 +105,10 @@ contract GHOUnicorns is IERC721Receiver {
 
         if (depositPosition.borrowedAmount > ghoOwned) {
             ghoToken.burn(address(this), ghoOwned);
-            depositPosition.borrowedAmount = depositPosition.borrowedAmount - ghoOwned;
+            depositPosition.borrowedAmount = depositPosition.borrowedAmount - ghoOwned*1e6;
         } else {
 
-            if (depositPosition.borrowedAmount*scalingFactor/depositPosition.value>=liquidRatio){
+            if (depositPosition.borrowedAmount*1e6/depositPosition.value>=liquidRatio){
 
                 ghoToken.burn(address(this), ghoOwned);
                 IERC721(positInfo.positionManager()).safeTransferFrom(

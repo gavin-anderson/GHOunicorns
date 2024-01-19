@@ -54,7 +54,7 @@ contract UniPositionInfo{
         return(amount0/1e12,amount1/1e12);
     }
 
-    function getTWAP(address poolAddress, uint32 timeInterval) external view returns (uint256) {
+    function getTWAP(address poolAddress, uint32 timeInterval, uint256 amount0, uint256 amount1) external view returns (uint256 fValue) {
         IUniswapV3Pool pool = IUniswapV3Pool(poolAddress);
 
         // Time intervals: current and past
@@ -68,19 +68,25 @@ contract UniPositionInfo{
         uint160 sqrtPriceX96 = TickMath.getSqrtRatioAtTick( int24((tickCumulatives[1] - tickCumulatives[0]) / timeInterval));
         uint256 priceX96 = FullMath.mulDiv(sqrtPriceX96, sqrtPriceX96, FixedPoint96.Q96);
         uint256 gPrice= (priceX96*1e6)/2**96;
-        return gPrice;
-       
-    }
 
-    function valueCalc(uint256 amount0, uint256 amount1, uint256 gPrice) external pure returns(uint256 fValue){
-        
         if(gPrice<1e6){
             fValue = amount1 + gPrice*amount0;
         }else{
             fValue = amount0 + gPrice*amount1;
         }
         return fValue;
-        
+       
     }
+
+//     function valueCalc(uint256 amount0, uint256 amount1, uint256 gPrice) external pure returns(uint256 fValue){
+        
+//         if(gPrice<1e6){
+//             fValue = amount1 + gPrice*amount0;
+//         }else{
+//             fValue = amount0 + gPrice*amount1;
+//         }
+//         return fValue;
+        
+//     }
 }
 
