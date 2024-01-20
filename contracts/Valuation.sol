@@ -6,32 +6,40 @@ import "./interfaces/IValuation.sol";
 
 
 contract Valuation{
-
+    
     constructor(){
 
     }
 
     function evaluate(address token0, address token1, uint256 gPrice, uint256 amount0, uint256 amount1)external view returns(uint256 fValue){
 
-        uint256 dec0 = getDecimals(token0);
+        // 6
+        uint256 dec0 = getDecimals(token0);  
+        // 18
         uint256 dec1 = getDecimals(token1);
+        uint256 amt0 = amount0*10**uint256(18-dec0);
+        uint256 amt1 = amount1*10**uint256(18-dec1);
         uint256 scale;
+       if (dec0>dec1){
+        scale = 10**uint256(dec0-dec1);
+       }else{
+        scale = 10**uint256(dec1-dec0);
+       }
+        
+       if (gPrice>scale){
+        gPrice=(gPrice/scale);
+        fValue = amt1+(gPrice*amt0)/1e18;
+        
+       }else{
+        gPrice=gPrice*scale;
+        fValue = amt0+(gPrice*amt1)/1e18;
+       }
 
-        if (dec0>dec1){
-            scale = 10**uint256(dec0-dec1);
-        }
-        else{
-            scale = 10**uint256(dec1-dec0);
-        }
-            
+       return(fValue);
 
-        if(gPrice>1e18){
-            fValue = amount0 + gPrice*amount1;
-        }else{
-            fValue = amount1 + gPrice*amount0;
-        }
-        return (fValue);
     }
+        
+    
 
     function getDecimals(address token) internal view returns(uint8){
         try ERC20(token).decimals() returns (uint8 tokenDecimals) {

@@ -16,9 +16,6 @@ interface IGHO is IERC20 {
 
     function burn(address from, uint256 amount) external;
 
-    // function approve(address spender, uint256 value) external virtual returns (bool);
-
-    // function transferFrom(address from, address to, uint256 value) external returns (bool);
 }
 
 contract GHOUnicorns is IERC721Receiver {
@@ -85,11 +82,11 @@ contract GHOUnicorns is IERC721Receiver {
         uint256 _borrowedAmount
     ) public{
         // IERC721(positInfo.positionManager()).safeTransferFrom(msg.sender,address(this),tokenId);
-        uint256 fValue = getValue(tokenId);
+        (uint256 fValue) = getValue(tokenId);
         require(_borrowedAmount/fValue <Loan2Value, "Borrowing Too Much");
         openPosition(tokenId,fValue,_borrowedAmount,msg.sender);
         ghoToken.mint(msg.sender, _borrowedAmount);
-     
+       
     }
 
     function getValue(uint256 tokenId)internal view returns(uint256 fValue){
