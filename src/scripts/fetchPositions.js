@@ -16,7 +16,7 @@ const nfpmContract = new ethers.Contract(
   provider
 );
 
-export default async function getPositions(address) {
+export default async function fetchPositions(address) {
   const numPositions = await nfpmContract.balanceOf(address);
   const calls = [];
 
@@ -25,8 +25,6 @@ export default async function getPositions(address) {
   }
 
   const positionIds = await Promise.all(calls);
-
-  console.log(positionIds, "POSITION ID");
 
   const positionCalls = [];
 
