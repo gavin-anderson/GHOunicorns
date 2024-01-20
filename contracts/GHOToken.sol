@@ -25,4 +25,6 @@ contract GHOToken is ERC20, Ownable{
         require(msg.sender == admin, "Only admin can burn");
         _burn(from, amount);
     }
+
+    
 }

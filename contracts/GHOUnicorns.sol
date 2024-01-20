@@ -9,18 +9,22 @@ import "@openzeppelin/contracts/token/ERC721/IERC721.sol";
 import "./interfaces/IUniPositionInfo.sol";
 
 import"./interfaces/IValuation.sol";
-// import "./GHOToken.sol";
+import "./GhoToken.sol";
 
-// interface IGHO is IERC20 {
-//     function mint(address to, uint256 amount) external;
+interface IGHO is IERC20 {
+    function mint(address to, uint256 amount) external;
 
-//     function burn(address from, uint256 amount) external;
-// }
+    function burn(address from, uint256 amount) external;
+
+    // function approve(address spender, uint256 value) external virtual returns (bool);
+
+    // function transferFrom(address from, address to, uint256 value) external returns (bool);
+}
 
 contract GHOUnicorns is IERC721Receiver {
 
     // Token Address
-    // IGHO public ghoToken;
+    IGHO public ghoToken;
 
     // // Position Info contract
     IUniPositionInfo public positInfo;
@@ -40,8 +44,8 @@ contract GHOUnicorns is IERC721Receiver {
     uint256 public constant Loan2Value = 75e16;
     uint256 public constant liquidRatio = 8e17;
 
-    constructor(address _positInfo, address _positVal) {
-        // ghoToken = IGHO(_ghoToken);
+    constructor( address _ghoToken, address _positInfo, address _positVal) {
+        ghoToken = IGHO(_ghoToken);
         positInfo = IUniPositionInfo(_positInfo);
         positVal = IValuation(_positVal);
     }
@@ -84,7 +88,7 @@ contract GHOUnicorns is IERC721Receiver {
         uint256 fValue = getValue(tokenId);
         require(_borrowedAmount/fValue <Loan2Value, "Borrowing Too Much");
         openPosition(tokenId,fValue,_borrowedAmount,msg.sender);
-        // GHO _mint
+        ghoToken.mint(msg.sender, _borrowedAmount);
      
     }
 
@@ -95,41 +99,42 @@ contract GHOUnicorns is IERC721Receiver {
         
     }
 
+    function checkGhoBalance(address userAddress) public view returns(uint256){
+        return ghoToken.balanceOf(userAddress);
+    }
 
+   function payback(uint256 tokenId, uint256 ghoRepaid) public {
+        // partial payback can help loan health/ if fully paid back sent nft back to owner. Money needs to be sent in same transaction.
+        ghoToken.transferFrom(msg.sender,address(this),ghoRepaid);
 
+        Deposit storage depositPosition = deposits[tokenId];
 
-    
+        // Partial Payback
+        if (depositPosition.borrowedAmount > ghoRepaid) {
+            ghoToken.burn(address(this), ghoRepaid);
+            depositPosition.borrowedAmount = depositPosition.borrowedAmount - ghoRepaid;
+        } else {
 
-//    function payback(uint256 tokenId) public {
-//         // partial payback can help loan health/ if fully paid back sent nft back to owner. Money needs to be sent in same transaction.
-//         uint256 ghoOwned = ghoToken.balanceOf(address(this));
-//         require(ghoOwned > 0, "No GHO sent");
-//         Deposit storage depositPosition = deposits[tokenId];
+            if (depositPosition.borrowedAmount/depositPosition.value>=liquidRatio){
 
-//         if (depositPosition.borrowedAmount > ghoOwned) {
-//             ghoToken.burn(address(this), ghoOwned);
-//             depositPosition.borrowedAmount = depositPosition.borrowedAmount - ghoOwned*1e6;
-//         } else {
+                ghoToken.burn(address(this), ghoRepaid);
+            //     IERC721(positInfo.positionManager()).safeTransferFrom(
+            //     address(this),
+            //     msg.sender,
+            //     tokenId
+            // );
+            
 
-//             if (depositPosition.borrowedAmount*1e6/depositPosition.value>=liquidRatio){
+            }else{
+                ghoToken.burn(address(this), ghoRepaid);
+            //     IERC721(positInfo.positionManager()).safeTransferFrom(
+            //     address(this),
+            //     depositPosition.owner,
+            //     tokenId
+            // );
+            }
 
-//                 ghoToken.burn(address(this), ghoOwned);
-//                 IERC721(positInfo.positionManager()).safeTransferFrom(
-//                 address(this),
-//                 msg.sender,
-//                 tokenId
-//             );
-//             closePosition(tokenId);
-
-//             }else{
-//                 ghoToken.burn(address(this), ghoOwned);
-//                 IERC721(positInfo.positionManager()).safeTransferFrom(
-//                 address(this),
-//                 depositPosition.owner,
-//                 tokenId
-//             );
-//             closePosition(tokenId);
-//             }
-//         }
-//     }
+            closePosition(tokenId);
+        }
+    }
 }
