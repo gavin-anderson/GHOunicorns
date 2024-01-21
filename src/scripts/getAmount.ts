@@ -11,14 +11,14 @@ export const calcAmount0 = (
   token0Decimals: number,
   token1Decimals: number
 ) => {
-  console.log(
-    liquidity,
-    currentPrice,
-    priceUpper,
-    token0Decimals,
-    token1Decimals,
-    "PARAMTERSSSSS"
-  );
+  // console.log(
+  //   liquidity,
+  //   currentPrice,
+  //   priceUpper,
+  //   token0Decimals,
+  //   token1Decimals,
+  //   "PARAMTERSSSSS"
+  // );
   const upper = tickToPrice(priceUpper, token0Decimals, token1Decimals);
   const decimalAdjustment = 10 ** (token0Decimals - token1Decimals);
   const mathCurrentPrice = currentPrice / decimalAdjustment;

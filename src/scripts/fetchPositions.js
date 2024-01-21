@@ -25,6 +25,7 @@ export default async function fetchPositions(address) {
   }
 
   const positionIds = await Promise.all(calls);
+  // console.log(positionIds, "IDDDDDDD");
 
   const positionCalls = [];
 
@@ -34,8 +35,12 @@ export default async function fetchPositions(address) {
 
   const callResponses = await Promise.all(positionCalls);
 
-  const positionInfos = callResponses.map((position) => {
+  const positionInfos = callResponses.map((position, index) => {
+    const positionId = positionIds[index].lte(ethers.constants.MaxUint256)
+      ? positionIds[index].toNumber()
+      : positionIds[index].toString();
     return {
+      id: positionId,
       tickLower: position.tickLower,
       tickUpper: position.tickUpper,
       liquidity: JSBI.BigInt(position.liquidity),
@@ -48,6 +53,8 @@ export default async function fetchPositions(address) {
       fee: position.fee,
     };
   });
+
+  // console.log(positionInfos, "OIWNEFOWIEBLFNOWIEFNHWOERJFNWREKJFLBNWREKFJLN");
 
   return positionInfos;
 }

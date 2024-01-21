@@ -1,29 +1,46 @@
-{
-  "_format": "hh-sol-artifact-1",
-  "contractName": "Valuation",
-  "sourceName": "contracts/Valuation.sol",
-  "abi": [
-    {
-      "inputs": [],
-      "stateMutability": "nonpayable",
-      "type": "constructor"
-    },
-    {
-      "inputs": [],
-      "name": "getPositionValue",
-      "outputs": [
-        {
-          "internalType": "uint256",
-          "name": "",
-          "type": "uint256"
-        }
-      ],
-      "stateMutability": "pure",
-      "type": "function"
-    }
-  ],
-  "bytecode": "0x608060405234801561001057600080fd5b5060b28061001f6000396000f3fe6080604052348015600f57600080fd5b506004361060285760003560e01c8063b44b3a8f14602d575b600080fd5b60336047565b604051603e91906063565b60405180910390f35b600090565b6000819050919050565b605d81604c565b82525050565b6000602082019050607660008301846056565b9291505056fea26469706673582212203a50cb0938394a6c168c439b8ebf2d87d294ce8f1e38d939f485bf0142a6c6b264736f6c63430008150033",
-  "deployedBytecode": "0x6080604052348015600f57600080fd5b506004361060285760003560e01c8063b44b3a8f14602d575b600080fd5b60336047565b604051603e91906063565b60405180910390f35b600090565b6000819050919050565b605d81604c565b82525050565b6000602082019050607660008301846056565b9291505056fea26469706673582212203a50cb0938394a6c168c439b8ebf2d87d294ce8f1e38d939f485bf0142a6c6b264736f6c63430008150033",
-  "linkReferences": {},
-  "deployedLinkReferences": {}
-}
+[
+  {
+    "inputs": [],
+    "stateMutability": "nonpayable",
+    "type": "constructor"
+  },
+  {
+    "inputs": [
+      {
+        "internalType": "address",
+        "name": "token0",
+        "type": "address"
+      },
+      {
+        "internalType": "address",
+        "name": "token1",
+        "type": "address"
+      },
+      {
+        "internalType": "uint256",
+        "name": "gPrice",
+        "type": "uint256"
+      },
+      {
+        "internalType": "uint256",
+        "name": "amount0",
+        "type": "uint256"
+      },
+      {
+        "internalType": "uint256",
+        "name": "amount1",
+        "type": "uint256"
+      }
+    ],
+    "name": "evaluate",
+    "outputs": [
+      {
+        "internalType": "uint256",
+        "name": "fValue",
+        "type": "uint256"
+      }
+    ],
+    "stateMutability": "view",
+    "type": "function"
+  }
+]

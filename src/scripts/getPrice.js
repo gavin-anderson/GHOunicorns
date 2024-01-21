@@ -32,7 +32,7 @@ const getPrice = async (token0, token1, feeAmount) => {
     const poolAddress = await factory.getPool(token0, token1, feeAmount);
     const pool = new ethers.Contract(poolAddress, poolABI, provider);
     const slot0 = await pool.slot0();
-    console.log("slot0", slot0);
+    // console.log("slot0", slot0);
     return slot0;
   } catch (error) {
     console.log(error, "this is the error for getPrice");

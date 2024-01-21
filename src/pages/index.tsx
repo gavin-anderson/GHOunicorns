@@ -8,7 +8,7 @@ import { styled } from "@mui/material/styles";
 import AddBoxIcon from "@mui/icons-material/AddBox";
 import ManageHistoryIcon from "@mui/icons-material/ManageHistory";
 import NavBar from "../components/NavBar";
-import { Typography } from "@mui/material";
+import { Button, Typography } from "@mui/material";
 import ValidPositions from "../components/ValidPositions";
 import { useAccount } from "wagmi";
 
@@ -74,7 +74,7 @@ export default function HomePage() {
           justifyContent: "flex-start",
           background:
             "radial-gradient(circle, #051937, #182342, #272e4d, #363958, #454464);",
-          pt: "13vh", // 1/3rd from the top
+          pt: "5vh", // 1/3rd from the top
         }}
       >
         <Box
@@ -98,10 +98,7 @@ export default function HomePage() {
             />
           </CustomTabs>
           <Paper
-            elevation={4}
             sx={{
-              width: "100%",
-              maxWidth: 500,
               mt: 2, // space between tabs and content
               mb: 2, // space at the bottom
               p: 3,
@@ -118,7 +115,7 @@ export default function HomePage() {
                 left: 0,
                 width: "100%",
                 height: "100%",
-                backgroundImage:
+                background:
                   "linear-gradient(145deg, rgba(255, 255, 255, 0.15), rgba(255, 255, 255, 0))",
                 borderRadius: "16px", // Ensure the overlay has the same border radius
               },

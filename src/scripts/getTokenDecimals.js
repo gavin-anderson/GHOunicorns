@@ -6,7 +6,7 @@ const provider = new ethers.providers.JsonRpcProvider(
 );
 
 async function getTokenDecimals(tokenAddress) {
-  console.log("ARE WE GHERE");
+  // console.log("ARE WE GHERE");
   const tokenContract = new ethers.Contract(tokenAddress, ERC20_ABI, provider);
   return await tokenContract.decimals();
 }

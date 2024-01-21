@@ -21,15 +21,10 @@ import {
   getDefaultConfig,
 } from "connectkit";
 
-
 const pages = ["Products", "Pricing", "Blog"];
 const settings = ["Profile", "Account", "Dashboard", "Logout"];
 
 function NavBar() {
- 
-  
-
-
   const [anchorElNav, setAnchorElNav] = React.useState<null | HTMLElement>(
     null
   );
@@ -59,6 +54,7 @@ function NavBar() {
     <AppBar
       sx={{
         background: "#14233D",
+        marginBottom: "0px",
       }}
       position="static"
     >
@@ -136,12 +132,11 @@ function NavBar() {
 
           <Box sx={{ flexGrow: 0 }}>
             {/* <ConnectKitButton customTheme={theme} /> */}
-            <ConnectKitButton.Custom >
+            <ConnectKitButton.Custom>
               {({ isConnected, show, truncatedAddress, ensName }) => {
                 return (
                   <Button
                     onClick={show}
-                    
                     sx={{
                       borderRadius: "50px",
                       padding: "10px",
