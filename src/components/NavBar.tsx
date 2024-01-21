@@ -76,7 +76,7 @@ function NavBar() {
               textDecoration: "none",
             }}
           >
-            LOGO
+            GHOunicorns
           </Typography>
 
           <Box sx={{ flexGrow: 1, display: { xs: "flex", md: "none" } }}>
